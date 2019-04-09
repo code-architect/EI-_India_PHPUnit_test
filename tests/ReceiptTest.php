@@ -40,7 +40,6 @@ class ReceiptTest extends TestCase
         $input = 10.00;
         $taxInput = 0.10;
         $output = $this->receipt->tax($input, $taxInput);
-        $output = $this->receipt->total($input);
         $this->assertEquals(1.00, $output, 'The tax calculation equal 1.0');
     }
 }
