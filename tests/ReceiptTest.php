@@ -7,9 +7,27 @@ use TDD\Receipt;                    // import the class we want to test
 
 class ReceiptTest extends TestCase
 {
+    /**
+     * Creating a new instance of the Receipt
+     */
+    public function setUp()
+    {
+        $this->receipt = new Receipt();
+    }
+
+    /**
+     * Un-setting the instance to ensure php does't carry anything over
+     * from one test run to the next
+     */
+    public function tearDown()
+    {
+        unset($this->receipt);
+    }
+
     public function testTotal()
     {
-        $recepit = new Receipt();
-        $this->assertEquals(10, $recepit->total([0,2,5,3]), 'When summing The total should equal 10');
+        $input = [0,2,5,3];
+        $output = $this->receipt->total($input);
+        $this->assertEquals(10, $output, 'When summing The total should equal 10');
     }
 }
