@@ -24,10 +24,23 @@ class ReceiptTest extends TestCase
         unset($this->receipt);
     }
 
+    /**
+     * Checking the basic functionality of the method
+     */
     public function testTotal()
     {
         $input = [0,2,5,3];
         $output = $this->receipt->total($input);
         $this->assertEquals(10, $output, 'When summing The total should equal 10');
+    }
+
+
+    public function testTax()
+    {
+        $input = 10.00;
+        $taxInput = 0.10;
+        $output = $this->receipt->tax($input, $taxInput);
+        $output = $this->receipt->total($input);
+        $this->assertEquals(1.00, $output, 'The tax calculation equal 1.0');
     }
 }
