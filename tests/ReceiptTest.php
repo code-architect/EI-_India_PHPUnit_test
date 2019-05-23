@@ -30,8 +30,21 @@ class ReceiptTest extends TestCase
     public function testTotal()
     {
         $input = [0,2,5,3];
-        $output = $this->receipt->total($input);
+        $coupon = null;
+        $output = $this->receipt->total($input, $coupon);
         $this->assertEquals(10, $output, 'When summing The total should equal 10');
+    }
+
+
+    /**
+     * Checking the basic functionality of the method
+     */
+    public function testTotalWithCoupon()
+    {
+        $input = [0,2,5,8];
+        $coupon = 0.20;
+        $output = $this->receipt->total($input, $coupon);
+        $this->assertEquals(12, $output, 'When summing The total should equal 12');
     }
 
 

@@ -8,9 +8,13 @@ class Receipt
      * @param array $items
      * @return float|int
      */
-    public function total(array $items = [])
+    public function total(array $items = [], $coupon)
     {
-        return array_sum($items);
+        $sum = array_sum($items);
+        if(!is_null($coupon)){
+            return $sum - ($sum * $coupon);
+        }
+        return $sum;
     }
 
     /**
