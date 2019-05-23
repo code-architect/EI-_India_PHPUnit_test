@@ -48,15 +48,26 @@ class ReceiptTest extends TestCase
     }
 
 
+    /**
+     * testing using stub
+     */
     public function testPostTaxTotal()
     {
+        $items = [1, 2, 5, 8];
+        $tax = 0.20;
+        $coupon = null;
+
         $Receipt = $this->getMockBuilder('TDD\Receipt') //only builder phpunit provides is a mock, but we can ignore some specific features of a mock test class and instead use it a stub
              ->setMethods(['tax', 'total'])                      // it takes an array of methods for the test double to respond to
              ->getMock();                                    // return the instance of the mock
 
-        $Receipt->method('total')               // passing as a string the name of the method, that we want to define what exacally our stub wwill perform
+        $Receipt->expects($this->once())            // this means we only call our "total" method once
+            ->method('total')               // passing as a string the name of the method, that we want to define what epically our stub will perform
+            ->with($items, $coupon)
             ->will($this->returnValue(10.00));     // this method "will" tells what exactly will that stub method do
-        $Receipt->method('tax')
+        $Receipt->expects($this->once())
+            ->with(10.00, $tax)
+            ->method('tax')
             ->will($this->returnValue(1.00));
 
         // Now we will perform the test
