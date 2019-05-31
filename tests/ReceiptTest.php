@@ -7,12 +7,21 @@ use TDD\Receipt;                    // import the class we want to test
 
 class ReceiptTest extends TestCase
 {
+    private $receipt;
+    private $formatter;
     /**
      * Creating a new instance of the Receipt
      */
     public function setUp()
     {
-        $this->receipt = new Receipt();
+        $this->formatter = $this->getMockBuilder('TDD\Formatter')
+                                ->setMethods(['currencyAmt'])
+                                ->getMock();
+        $this->formatter->expects($this->any())
+                        ->method('currencyAmt')
+                        ->with($this->anything())
+                        ->will($this->returnArgument(0));
+        $this->receipt = new Receipt($this->formatter);
     }
 
     /**
@@ -26,19 +35,19 @@ class ReceiptTest extends TestCase
 
     /**
      * * Checking the basic functionality of the method
-     * @dataProvider provideTotal
+     * @dataProvider provideSubTotal
      * @param $items
      * @param $expected
      */
-    public function testTotal($items, $expected)
+    public function testSubTotal($items, $expected)
     {
         $coupon = null;
-        $output = $this->receipt->total($items, $coupon);
+        $output = $this->receipt->subTotal($items, $coupon);
         $this->assertEquals($expected, $output, "When summing The total should equal $expected");
     }
 
     // data provider for testTotal
-    public function provideTotal()
+    public function provideSubTotal()
     {
         return [
             [[1, 2, 5, 8], 16],
@@ -51,11 +60,11 @@ class ReceiptTest extends TestCase
     /**
      * Checking the basic functionality of the method with coupon
      */
-    public function testTotalWithCoupon()
+    public function testSubTotalWithCoupon()
     {
         $input = [0,2,5,8];
         $coupon = 0.20;
-        $output = $this->receipt->total($input, $coupon);
+        $output = $this->receipt->subTotal($input, $coupon);
         $this->assertEquals(12, $output, 'When summing The total should equal 12');
     }
 
@@ -63,12 +72,12 @@ class ReceiptTest extends TestCase
     /**
      * Testing exception
      */
-    public function testTotalException()
+    public function testSubTotalException()
     {
         $input = [0,2,5,8];
         $coupon = 1.20;
         $this->expectException('BadMethodCallException');
-        $this->receipt->total($input, $coupon);
+        $this->receipt->subTotal($input, $coupon);
     }
 
 
@@ -82,11 +91,12 @@ class ReceiptTest extends TestCase
         $coupon = null;
 
         $Receipt = $this->getMockBuilder('TDD\Receipt') //only builder phpunit provides is a mock, but we can ignore some specific features of a mock test class and instead use it a stub
-             ->setMethods(['tax', 'total'])                      // it takes an array of methods for the test double to respond to
+             ->setMethods(['tax', 'subTotal'])                      // it takes an array of methods for the test double to respond to
+             ->setConstructorArgs([$this->formatter])
              ->getMock();                                    // return the instance of the mock
 
         $Receipt->expects($this->once())            // this means we only call our "total" method once
-            ->method('total')               // passing as a string the name of the method, that we want to define what epically our stub will perform
+            ->method('subTotal')               // passing as a string the name of the method, that we want to define what epically our stub will perform
             ->with($items, $coupon)
             ->will($this->returnValue(10.00));     // this method "will" tells what exactly will that stub method do
         $Receipt->expects($this->once())
@@ -108,24 +118,5 @@ class ReceiptTest extends TestCase
         $this->assertEquals(1.00, $output, 'The tax calculation equal 1.0');
     }
 
-    /**
-     * @dataProvider provideCurrencyAmt
-     * @param $input
-     * @param $expected
-     * @param $message
-     */
-    public function testCurrencyAmount($input, $expected, $message)
-    {
-        $this->assertSame($expected, $this->receipt->currencyAmt($input), $message);
-    }
 
-    public function provideCurrencyAmt()
-    {
-        return [
-            [1, 1.00, '1 should be transformed into 1.00'],
-            [1.1, 1.10, '1.1 should be transformed into 1.10'],
-            [1.11, 1.11, '1.11 should be transformed into 1.11'],
-            [1.111, 1.11, '1.111 should be transformed into 1.11']
-        ];
-    }
 }

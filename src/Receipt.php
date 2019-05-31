@@ -4,15 +4,20 @@ use \BadMethodCallException;
 
 class Receipt
 {
+    public function __construct($formatter)
+    {
+        $this->formatter = $formatter;
+    }
+
     /**
      * Sum up the values and return
      * @param array $items
      * @return float|int
      */
-    public function total(array $items = [], $coupon)
+    public function subTotal(array $items = [], $coupon)
     {
         if($coupon > 1.00){
-            throw new \PHPUnit\Framework\MockObject\BadMethodCallException('Coupon must be less then or equal to 1.00');
+            throw new BadMethodCallException('Coupon must be less then or equal to 1.00');
         }
         $sum = array_sum($items);
         if(!is_null($coupon)){
@@ -29,7 +34,7 @@ class Receipt
      */
     public function tax($amount, $taxPercentage)
     {
-        return ($amount * $taxPercentage);
+        return $this->formatter->currencyAmt($amount * $taxPercentage);
     }
 
     public function postTaxTotal($items, $tax, $coupon)
@@ -38,8 +43,4 @@ class Receipt
         return $subtotal + $this->tax($subtotal, $tax);
     }
 
-    public function currencyAmt($input)
-    {
-        return round($input, 2);
-    }
 }
